@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+        }
+
+        #canvas-container {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+
+        #canvas {
+            border: 2px solid #ccc;
+            transform: rotateX(20deg) rotateY(20deg);
+        }
+
+        #sidebar {
+            width: 80px;
+            background-color: #eee;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            transform: rotateY(20deg);
+        }
+
+        .tool {
+            margin-bottom: 10px;
+            cursor: pointer;
+            transform: rotateY(-20deg);
+        }
+
+        #shapes {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .shape {
+            margin-bottom: 5px;
+            cursor: pointer;
+            transform: rotateY(-20deg);
+        }
+    </style>
+    <title>Drawing Dashboard</title>
+</head>
+<body>
+    <div id="canvas-container">
+        <canvas id="canvas" width="600" height="400"></canvas>
+    </div>
+    <div id="sidebar">
+        <div class="tool" onclick="selectPen()">
+            ✏️
+        </div>
+        <div class="tool" onclick="selectEraser()">
+            🧽
+        </div>
+        <div id="shapes">
+            <div class="shape" onclick="drawCube()">🔷</div>
+            <div class="shape" onclick="drawSphere()">⚪</div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const context = canvas.getContext('2d');
+        let drawing = false;
+        let eraser = false;
+        let penColor = 'black';
+
+        function startDrawing(e) {
+            drawing = true;
+            draw(e);
+        }
+
+        function stopDrawing() {
+            drawing = false;
+            context.beginPath();
+        }
+
+        function draw(e) {
+            if (!drawing) return;
+
+            context.lineWidth = eraser ? 20 : 2;
+            context.lineCap = 'round';
+            context.strokeStyle = eraser ? '#f0f0f0' : penColor;
+
+            context.lineTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+            context.stroke();
+            context.beginPath();
+            context.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+        }
+
+        function selectPen() {
+            eraser = false;
+        }
+
+        function selectEraser() {
+            eraser = true;
+        }
+
+        function selectColor(color) {
+            penColor = color;
+            eraser = false;
+        }
+
+        function drawCube() {
+            context.fillStyle = penColor;
+            context.fillRect(200, 150, 100, 100);
+        }
+
+        function drawSphere() {
+            context.beginPath();
+            context.arc(300, 200, 50, 0, 2 * Math.PI);
+            context.fillStyle = penColor;
+            context.fill();
+            context.stroke();
+        }
+
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mousemove', draw);
+    </script>
+</body>
+</html>
